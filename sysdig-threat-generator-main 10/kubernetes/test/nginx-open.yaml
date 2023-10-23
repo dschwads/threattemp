@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-dbg
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-dbg
+  namespace: nginx-dbg
+  labels:
+    app: nginx-dbg
+spec:
+  selector:
+    app: nginx-dbg
+  type: NodePort
+  ports:
+    - name: tcp-1
+      port: 6666
+      targetPort: 6666
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-dbg
+  name: nginx-dbg
+  namespace: nginx-dbg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-dbg
+  template:
+    metadata:
+      labels:
+        app: nginx-dbg
+    spec:
+      containers:
+        - name: nginx-dbg
+          image: nginx:1.14.2
+          ports:
+            - hostPort: 42069   
+              containerPort: 80
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN", "NET_RAW", "FOWNER"]
+        #   lifecycle:
+        #     postStart:
+        #       exec:
+        #         command:
+        #           [
+        #             "/bin/sh",
+        #             "-c",
+        #             "echo Begin; /sbin/rctp qdisc add dev eth0 root tbf rate 500kbit burst 500kbit limit 1mbit; /sbin/rctp qdisc show  dev eth0;",
+        #           ]
+        #     preStop:
+        #       exec:
+        #         command: ["/bin/sh", "-c", "echo 'done'"]

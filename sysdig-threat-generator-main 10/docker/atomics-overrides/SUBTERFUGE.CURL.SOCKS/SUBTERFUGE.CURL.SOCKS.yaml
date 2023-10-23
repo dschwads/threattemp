@@ -1,0 +1,23 @@
+attack_technique: Test
+display_name: curl Using Socks Proxy
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      LOCAL_IP=$(curl -s http://checkip.amazonaws.com/)
+      IPS=$(curl -4fsSLkA- -m200 doh.pub/dns-query?name=relay.tor2socks.in | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | tr ' ' '\n' | grep -v "$LOCAL_IP")
+      for ip in $IPS; do echo -n "Trying $ip as proxy..."
+        data=$(curl -s --connect-timeout 3 -x socks5h://$ip:9050 http://www.google.com/)
+        ret=$?
+        if [ $ret -eq 0 ]
+        then echo "Success"
+          break
+        fi
+        echo "Failure"
+      done
+    name: bash
+    elevation_required: false

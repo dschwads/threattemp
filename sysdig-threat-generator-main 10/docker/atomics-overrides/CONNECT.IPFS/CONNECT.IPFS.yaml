@@ -1,0 +1,13 @@
+attack_technique: Test
+display_name: Connection to IPFS Network
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      curl -s https://ipfs.io/ipfs/QmQPeNsJPyVWPFDVHb77w8G42Fvo15z4bG2X8D2GhfbSXc/readme
+    name: bash
+    elevation_required: false

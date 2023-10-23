@@ -1,0 +1,14 @@
+attack_technique: Test
+display_name: Launch Remote File Copy Tools in Container
+atomic_tests:
+- name: Test
+  description: Test remote file copy tools launched in container
+  supported_platforms:
+    - containers
+  executor:
+    command: |
+      rsync $(which ls) /tmp/tmp_file
+    cleanup_command: |
+      rm /tmp/tmp_file
+    name: bash
+    elevation_required: false

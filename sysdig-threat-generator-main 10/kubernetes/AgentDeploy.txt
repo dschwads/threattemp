@@ -1,0 +1,39 @@
+kubectl create ns sysdig-agent
+helm repo add sysdig https://charts.sysdig.com
+helm repo update
+
+helm install sysdig -n sysdig-agent sysdig/sysdig-deploy \
+--set global.sysdig.accessKey=##### REPLACE WITH ACCOUNT ACCESS KEY ###### \
+--set global.clusterConfig.name=#### REPLACE WITH CLUSTER NAME #### \
+--set global.sysdig.region=us4 \
+--set global.kspm.deploy=true \
+--set agent.sysdig.settings.drift_killer.enabled=true \
+--set agent.sysdig.settings.enrich_with_process_lineage=true \
+--set resourceProfile=custom \
+--set agent.sysdig.settings.app_checks_enabled=false \
+--set agent.sysdig.settings.feature.mode=secure
+--set agent.resources.requests.cpu=300m \
+--set agent.resources.requests.memory=512Mi \
+--set agent.resources.limits.cpu=1000m \
+--set agent.resources.limits.memory=1024Mi \
+--set agent.slim.resources.requests.cpu=300m \
+--set agent.ebpf.enabled=true \
+--set nodeAnalyzer.secure.vulnerabilityManagement.newEngineOnly=true \
+--set nodeAnalyzer.nodeAnalyzer.imageAnalyzer.deploy=false \
+--set nodeAnalyzer.nodeAnalyzer.benchmarkRunner.deploy=false \
+--set nodeAnalyzer.nodeAnalyzer.hostAnalyzer.deploy=false \
+--set nodeAnalyzer.nodeAnalyzer.hostScanner.deploy=false \
+--set nodeAnalyzer.nodeAnalyzer.runtimeScanner.deploy=true \
+--set nodeAnalyzer.nodeAnalyzer.runtimeScanner.eveConnector.deploy=true \
+--set nodeAnalyzer.nodeAnalyzer.runtimeScanner.settings.eveEnabled=true
+
+
+helm install sysdig-admission-controller \
+--create-namespace \
+--namespace sysdig-admission-controller \
+--set sysdig.secureAPIToken=##### REPLACE WITH SECURE API TOKEN ###### \
+--set clusterName=#### REPLACE WITH CLUSTER NAME #### \
+--set sysdig.url=### REPLACE WITH CORRECT REGION ###### \
+--set features.publishOnSecureEventFeed=true \
+--set features.k8sAuditDetections=true \
+sysdig/admission-controller

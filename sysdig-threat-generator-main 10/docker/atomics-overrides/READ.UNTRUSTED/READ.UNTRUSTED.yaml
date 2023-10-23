@@ -1,0 +1,19 @@
+attack_technique: Test
+display_name: Read sensitive files untrusted
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      SHADOW=$(cat /etc/shadow)
+      for line in $SHADOW
+        do HASH=$(echo $line | awk -F ':' '{print $2}')
+        if [ "$HASH" != "*" ]
+          then echo "$HASH"
+        fi
+      done
+    name: bash
+    elevation_required: true

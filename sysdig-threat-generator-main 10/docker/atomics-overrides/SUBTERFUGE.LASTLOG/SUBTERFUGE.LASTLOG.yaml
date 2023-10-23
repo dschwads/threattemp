@@ -1,0 +1,26 @@
+attack_technique: Test
+display_name: Lastlog Files Cleared
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Username:
+      description: Temporary username required for this test
+      type: String
+      default: lastlog_tmp_user
+  executor:
+    command: |
+      LOG_SIZE=$(wc -c < /var/log/lastlog)
+      HIGHEST_UID=$(($LOG_SIZE / 292 - 1))
+      useradd -M -N -u $(($HIGHEST_UID + 1)) "#{Username}"
+      truncate -s -292 /var/log/lastlog
+      echo wZeOY3B0cy8xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMTI3LjAuMC4xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA== | base64 -d >> /var/log/lastlog
+      lastlog --clear --user "#{Username}"
+    cleanup_command: |
+      userdel "#{Username}"
+      truncate -s -292 /var/log/lastlog
+    name: bash
+    elevation_required: true

@@ -1,0 +1,69 @@
+name: Validation - Sysdig Threat Generator
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docker/atomics-overrides/**'
+      - 'automation/**'
+
+  workflow_dispatch:
+#   workflow_call:
+#     secrets:
+#       RW_JSON_KEY:
+#         required: true
+
+jobs:
+  stg-validation:
+    runs-on: threat-research-runner
+    steps:
+      # re-enable below when falco rules gets fixed
+
+      # - name: Checkout FalcoRules
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: 'draios/falco_rules'
+      #     token: ${{secrets.PAT}}
+      #     ref: 'master'
+
+      # - name: mk falco dir, mash our file together
+      #   run: |
+      #       cat rules_files/threat_intelligence_feed.yaml/8/content | cat - rules_files/falco_rules.yaml/13/content > ./temp
+      #       python3 -c 'import yaml, sys; print(yaml.safe_load(sys.stdin))' < ./temp
+      #       sudo mkdir /etc/falco
+      #       sudo mv ./temp /etc/falco/falco_rules.yaml
+      - name: Checkout STG
+        uses: actions/checkout@v3
+        with:
+          lfs: 'true'
+
+      - name: mk falco dir, use fakerules
+        run: |
+          python3 -c 'import yaml, sys; print(yaml.safe_load(sys.stdin))' < ./automation/test_rules.txt
+          sudo mkdir /etc/falco
+          sudo mv ./automation/test_rules.txt /etc/falco/falco_rules.yaml
+
+      - name: setup falco.yaml
+        run: sudo mv automation/falco.yaml /etc/falco/
+
+      - name: Login to dhub
+        uses: docker/login-action@v2
+        env:
+          GAR_REGISTRY: docker.io
+        with:
+          registry: ${{ env.GAR_REGISTRY }}
+          username: dockerbadboy
+          password: ${{ secrets.RW_JSON_KEY }}
+
+      - name: Build docker images
+        run: docker build -t dockerbadboy/art ./docker && docker pull andreater/falco-modern-x86:latest
+      - name: Get Sysdig and Falco
+        run: |
+            wget https://github.com/draios/sysdig/releases/download/0.31.5/sysdig-0.31.5-x86_64.deb -O ./sysdig.deb && \
+            sudo apt-get update && \
+            DEBIAN_FRONTENT=noninteractive sudo apt-get install -y dkms && \
+            sudo dpkg -i ./sysdig.deb
+      - name: Run test
+        run: sudo python3 automation/test.py ./docker/atomics-overrides
+        shell: bash
+      - name: Push docker images
+        run: docker push dockerbadboy/art:latest

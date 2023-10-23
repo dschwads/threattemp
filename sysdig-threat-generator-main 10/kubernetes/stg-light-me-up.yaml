@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: threatgen
+  labels:
+    app: threatgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: threatgen
+  template:
+    metadata:
+      labels:
+        app: threatgen
+    spec:
+      containers:
+      - name: threatgen
+        image: dockerbadboy/art:latest
+        command: ["pwsh", "-c", "(./RunTests.ps1 XMRIG.EXEC STDIN.NETWORK DEV.SHM.EXEC T1048 RECON.FIND.SUID T1611.002 CONTAINER.ESCAPE.NSENTER CREDS.DUMP.MEMORY KILL.MALICIOUS.PROC LOAD.BPF.PROG Base64.PYTHON BASE64.CLI Base64.SHELLSCRIPT CONNECT.UNEXPECTED RECON.GPG SUBTERFUGE.LASTLOG LD.LINUX.EXEC LD.SO.PRELOAD USERFAULTFD.HANDLER RECON.LINPEAS PROOT.EXEC)"]
+        securityContext:
+          privileged: true
+      nodeSelector:
+        kubernetes.io/os: linux

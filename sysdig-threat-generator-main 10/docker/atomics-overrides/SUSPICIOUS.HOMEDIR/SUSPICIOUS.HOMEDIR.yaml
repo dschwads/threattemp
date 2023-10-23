@@ -1,0 +1,24 @@
+attack_technique: Test
+display_name: Suspicious homedir creation
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Username:
+      description: Name of the new user
+      type: String
+      default: backdoor
+    HomeDirectoryBasePath:
+      description: Base path for the newly created user's home directory
+      type: Path
+      default: /tmp
+  executor:
+    command:
+      /bin/sh -c 'useradd -m -d "#{HomeDirectoryBasePath}/#{Username}" "#{Username}"'
+    cleanup_command:
+      userdel -r "#{Username}" 2>/dev/null
+    name: bash
+    elevation_required: true

@@ -1,0 +1,1 @@
+Redirect STDOUT/STDIN to Network Connection in Container

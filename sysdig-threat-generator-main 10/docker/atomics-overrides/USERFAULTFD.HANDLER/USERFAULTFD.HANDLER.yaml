@@ -1,0 +1,31 @@
+attack_technique: Test
+display_name: Unprivileged Delegation of Page Faults Handling to a Userspace Process
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Username:
+      description: Temporary username used for this test
+      type: String
+      default: tmp_ufd_user
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_ufd_dir
+  executor:
+    command: |
+      echo 1 > /proc/sys/vm/unprivileged_userfaultfd
+      useradd -M -N -l "#{Temporary Username}" 2>/dev/null
+      mkdir "/tmp/#{Temporary Directory}" 2>/dev/null; cd "/tmp/#{Temporary Directory}"
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzeXMvbW1hbi5oPgojaW5jbHVkZSA8ZmNudGwuaD4KI2luY2x1ZGUgPHN5cy9zeXNjYWxsLmg+CiNpbmNsdWRlIDxsaW51eC91c2VyZmF1bHRmZC5oPgoKI2RlZmluZSBVRkZESU9fQVBJIDB4YzAxOGFhM2YKI2RlZmluZSBVRkZESU9fUkVHSVNURVIgMHhjMDIwYWEwMAoKaW50IG1haW4oKQp7CglpbnQgdWZmZDsKCXN0cnVjdCB1ZmZkaW9fYXBpIHVmX2FwaTsKCXN0cnVjdCB1ZmZkaW9fcmVnaXN0ZXIgdWZfcmVnaXN0ZXI7CgoJdWZmZCA9IHN5c2NhbGwoX19OUl91c2VyZmF1bHRmZCwgT19DTE9FWEVDIHwgT19OT05CTE9DSyk7Cgl1Zl9hcGkuYXBpID0gVUZGRF9BUEk7Cgl1Zl9hcGkuZmVhdHVyZXMgPSAwOwoKCWlmIChpb2N0bCh1ZmZkLCBVRkZESU9fQVBJLCAmdWZfYXBpKSA9PSAtMSkKCXsKCQlwZXJyb3IoImVycm9yIHdpdGggdGhlIHVmZmRpb19hcGkiKTsKCQlleGl0KC0xKTsKCX0KCgljaGFyICphZGRyID0gbW1hcChOVUxMLCAweDEwMDAsIFBST1RfUkVBRCB8IFBST1RfV1JJVEUsIE1BUF9QUklWQVRFIHwgTUFQX0FOT05ZTU9VUywgMCwgMCk7CglpZiAoYWRkciA9PSBOVUxMKQoJewoJCXBlcnJvcigibW1hcCBlcnJvciIpOwoJCWV4aXQoLTEpOwoJfQoKCXVmX3JlZ2lzdGVyLnJhbmdlLnN0YXJ0ID0gYWRkcjsKCXVmX3JlZ2lzdGVyLnJhbmdlLmxlbiA9IDB4MTAwMDsKCXVmX3JlZ2lzdGVyLm1vZGUgPSBVRkZESU9fUkVHSVNURVJfTU9ERV9NSVNTSU5HOwoKCWlmIChpb2N0bCh1ZmZkLCBVRkZESU9fUkVHSVNURVIsICZ1Zl9yZWdpc3RlcikgPT0gLTEpCgl7CgkJcGVycm9yKCJlcnJvciByZWdpc3RlcmluZyBwYWdlIGZvciB1c2VyZmF1bHRmZCIpOwoJCWV4aXQoLTEpOwoJfQoKICAgIHB1dHMoIlN1Y2Nlc3NmdWxseSByZWdpc3RlcmVkIHVzZXJmYXVsdGZkIHBhZ2UuIik7CgogICAgcmV0dXJuIDA7Cn0K | base64 -d > prog.c
+      gcc prog.c -o prog -w
+      sudo -u "#{Temporary Username}" ./prog
+    cleanup_command: |
+      userdel "#{Temporary Username}"
+      echo 0 > /proc/sys/vm/unprivileged_userfaultfd
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: true

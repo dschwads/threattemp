@@ -1,0 +1,15 @@
+attack_technique: Test
+display_name: Suspicious Kernel Parameter Modificaiton
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      sudo sysctl -w kernel.nmi_watchdog=0
+    cleanup_command: |
+      sudo sysctl -w kernel.nmi_watchdog=1
+    name: bash
+    elevation_required: true

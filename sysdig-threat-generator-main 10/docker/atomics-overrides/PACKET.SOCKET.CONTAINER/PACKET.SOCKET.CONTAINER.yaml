@@ -1,0 +1,23 @@
+attack_technique: Test
+display_name: Packet socket created in container
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_packetsock_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+CiNpbmNsdWRlIDxuZXRpbmV0L2luLmg+CiNpbmNsdWRlIDxuZXQvZXRoZXJuZXQuaD4KCmludCBtYWluKCkKewogICAgaW50IHMgPSBzb2NrZXQoQUZfUEFDS0VULCBTT0NLX1JBVywgaHRvbnMoRVRIX1BfQUxMKSk7CiAgICBpZiAocyA8IDApCiAgICB7CiAgICAgICAgcGVycm9yKCJzb2NrZXQiKTsKICAgICAgICByZXR1cm4gMTsKICAgIH0KCiAgICBzaHV0ZG93bihzLCBTSFVUX1JEV1IpOwoKICAgIHJldHVybiAwOwp9Cg== | base64 -d > prog.c
+      gcc prog.c
+      ./a.out
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: false

@@ -1,0 +1,13 @@
+attack_technique: Test
+display_name: Base64'd ELF file on Command Line
+atomic_tests:
+- name: Test
+  description: |
+    Base64 can be used to encode binary data for transfer to ASCII-only command lines.  Attackers can leverage this technique in various exploits to load shellcode and evade detection.
+  supported_platforms:
+  - linux
+  executor:
+    command: |
+      echo "f0VMRgIBAQAAAAAAAAAAAAIAPgABAAAAeABAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAOAABAAAAAAAAAAEAAAAHAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAAAAxgAAAAAAAAAUAQAAAAAAAAAQAAAAAAAAailYmWoCX2oBXg8FSJdSxwQkAgAFOUiJ5moQWmoxWA8FWWoyWA8FSJZqK1gPBVBWX2oJWJm2EEiJ1k0xyWoiQVqyBw8FSJZIl18PBf/m" | base64 -d > /dev/null
+    name: bash
+    elevation_required: false

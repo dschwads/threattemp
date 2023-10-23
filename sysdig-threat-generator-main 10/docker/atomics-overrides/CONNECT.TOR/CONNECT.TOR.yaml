@@ -1,0 +1,30 @@
+
+attack_technique: Test
+display_name: Outbound connection to TOR Entry Nodes
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  dependencies:
+    - description: TOR installed
+      prereq_command: |
+        which tor 1>/dev/null && which torify 1>/dev/null
+      get_prereq_command: |
+        sudo apt-get update
+        sudo apt-get -y install tor
+  executor:
+    command: |
+      tor & TOR_PID=$!
+      (echo >/dev/tcp/localhost/9050) &>/dev/null
+      RET=$?
+      while [ $RET -eq 1 ]
+      do (echo >/dev/tcp/localhost/9050) &>/dev/null
+        RET=$?
+        sleep 1
+      done
+      torify curl -s https://api.ipify.org; echo
+      kill -9 $TOR_PID && wait $TOR_PID
+    name: bash
+    elevation_required: false

@@ -1,0 +1,23 @@
+attack_technique: Test
+display_name: Create files below dev
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Filename:
+      description: Name of the file created below /dev
+      type: String
+      default: tmp_dev_file
+  executor:
+    command: |
+      MIN_MAJ=$(ls -l /dev/zero | awk -F ' ' '{print $5$6}')
+      MIN=$(echo $MIN_MAJ | awk -F ',' '{print $1}')
+      MAJ=$(echo $MIN_MAJ | awk -F ',' '{print $2}')
+      mknod "/dev/#{Filename}" c $MIN $MAJ
+    cleanup_command: |
+      rm "/dev/#{Filename}"
+    name: bash
+    elevation_required: true

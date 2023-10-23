@@ -1,0 +1,20 @@
+attack_technique: Test
+display_name: Kernel startup modules changed
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Modules Backup:
+      description: Path to the modules backup file
+      type: Path
+      default: /tmp/modules_bak
+  executor:
+    command: |
+      cp /etc/modules "#{Modules Backup}"
+      echo malicious_module >> /etc/modules
+      mv "#{Modules Backup}" /etc/modules
+    name: bash
+    elevation_required: true

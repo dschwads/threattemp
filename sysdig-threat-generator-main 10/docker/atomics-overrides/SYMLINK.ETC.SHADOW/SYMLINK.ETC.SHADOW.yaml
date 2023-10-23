@@ -1,0 +1,22 @@
+attack_technique: Test
+display_name: Create Symlink Over Sensitive Files
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_symlink_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      ln -s /etc/shadow shadow
+      cat shadow
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: true

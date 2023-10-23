@@ -1,0 +1,3 @@
+Malicious binary detected
+Detect outbound connections to common miner pool ports
+Detect crypto miners using the Stratum protocol

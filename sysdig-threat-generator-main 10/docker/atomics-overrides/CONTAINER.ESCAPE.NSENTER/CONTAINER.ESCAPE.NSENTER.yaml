@@ -1,0 +1,12 @@
+attack_technique: Test
+display_name: nsenter Container Escape
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - containers
+  executor:
+    command: |
+      nsenter --target 1 --mount --pid --uts --ipc --net -- hostname
+    name: bash
+    elevation_required: true

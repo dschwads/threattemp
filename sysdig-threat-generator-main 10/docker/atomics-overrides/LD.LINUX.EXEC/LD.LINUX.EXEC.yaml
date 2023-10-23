@@ -1,0 +1,22 @@
+attack_technique: Test
+display_name: Execution of binary using ld-linux
+atomic_tests:
+- name: Test
+  description: |
+    A binary was seen being executed by ld-linux. This method can be used to execute programs that do not have the exec bit set and may possibly evade detection measures.
+  supported_platforms:
+  - linux
+  input_arguments:
+    prog:
+      description: Path to the binary to execute
+      type: Path
+      default: $(which ls)
+  executor:
+    command: |
+            cp "#{prog}" /tmp/prog
+            chmod ugo-x /tmp/prog
+            /lib64/ld-linux-x86-64.so.2 /tmp/prog
+    cleanup_command: |
+            rm /tmp/prog
+    name: bash
+    elevation_required: false

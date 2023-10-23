@@ -1,0 +1,16 @@
+attack_technique: Test
+display_name: Package Management Process in Container
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      echo 'APT::Update::Pre-Invoke {"id"};' > /etc/apt/apt.conf.d/42backdoor
+      apt-get update
+    cleanup_command: |
+      rm -f /etc/apt/apt.conf.d/42backdoor
+    name: bash
+    elevation_required: true

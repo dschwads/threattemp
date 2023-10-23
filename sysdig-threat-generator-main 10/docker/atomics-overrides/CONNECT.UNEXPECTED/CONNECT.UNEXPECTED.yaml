@@ -1,0 +1,31 @@
+attack_technique: Test
+display_name: Unexpected connection from blacklisted process
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Hostname:
+      description: Hostname to connect to
+      type: String
+      default: google.com
+    Port:
+      description: Port to use when connecting to the specified hostname
+      type: String
+      default: 80
+    Temporary Directory:
+      description: Name of the temporary directory to use for this test
+      type: String
+      default: tmp_kmsd_test
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}/" 2>/dev/null; cd "/tmp/#{Temporary Directory}/"
+      echo I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8bmV0ZGIuaD4KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4KI2luY2x1ZGUgPGFycGEvaW5ldC5oPgojaW5jbHVkZSA8c3lzL3NvY2tldC5oPgoKLy8gLi9rbXNkIDxob3N0bmFtZT4gPHBvcnQ+CgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpCnsKICAgIGludCBzLCBmZDsKICAgIHN0cnVjdCBzb2NrYWRkcl9pbiBzZXJ2OwogICAgc3RydWN0IGhvc3RlbnQgKmhvc3RfZW50cnk7CgogICAgaWYgKGFyZ2MgIT0gMykgZXhpdCgxKTsKCiAgICBob3N0X2VudHJ5ID0gZ2V0aG9zdGJ5bmFtZShhcmd2WzFdKTsKICAgIGlmIChob3N0X2VudHJ5ID09IE5VTEwpCiAgICB7CiAgICAgICAgcGVycm9yKCJnZXRob3N0YnluYW1lIik7CiAgICAgICAgZXhpdCgxKTsKICAgIH0KCiAgICBzID0gc29ja2V0KEFGX0lORVQsIFNPQ0tfU1RSRUFNLCAwKTsKICAgIGlmIChzIDwgMCkKICAgIHsKICAgICAgICBwZXJyb3IoInNvY2tldCIpOwogICAgICAgIGV4aXQoMSk7CiAgICB9CgogICAgc2Vydi5zaW5fZmFtaWx5ID0gQUZfSU5FVDsKICAgIHNlcnYuc2luX3BvcnQgPSBodG9ucyhhdG9pKGFyZ3ZbMl0pKTsKICAgIHNlcnYuc2luX2FkZHIgPSAqKChzdHJ1Y3QgaW5fYWRkciAqKWhvc3RfZW50cnktPmhfYWRkcik7CgogICAgZmQgPSBjb25uZWN0KHMsIChzdHJ1Y3Qgc29ja2FkZHIgKikmc2Vydiwgc2l6ZW9mKHNlcnYpKTsKICAgIGlmIChmZCA8IDApCiAgICB7CiAgICAgICAgcGVycm9yKCJjb25uZWN0Iik7CiAgICAgICAgY2xvc2Uocyk7CiAgICAgICAgZXhpdCgxKTsKICAgIH0KCiAgICBjbG9zZShmZCk7CiAgICBjbG9zZShzKTsKCiAgICByZXR1cm4gMDsKfQo= | base64 -d > kmsd.c
+      gcc kmsd.c -o kmsd
+      ./kmsd "#{Hostname}" "#{Port}"
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}/"
+    name: bash
+    elevation_required: false

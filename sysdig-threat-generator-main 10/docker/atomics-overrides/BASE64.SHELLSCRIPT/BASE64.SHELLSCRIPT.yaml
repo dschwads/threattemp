@@ -1,0 +1,24 @@
+attack_technique: Test
+display_name: Base64-encoded Shell Script
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    ScriptTmpPath:
+      description: Base path for the temporary test file
+      type: Path
+      default: /tmp
+    ScriptName:
+      description: Name of the temporary test file
+      type: String
+      default: tmp_script.sh
+  executor:
+    command:
+      echo IyEvYmluL3NoCnNoIC1pID4mIC9kZXYvdGNwLzEyNy4wLjAuMS8xMzM3IDA+JjEK | base64 -d > "#{ScriptTmpPath}/#{ScriptName}"
+    cleanup_command:
+      rm -f "#{ScriptTmpPath}/#{ScriptName}"
+    name: bash
+    elevation_required: false

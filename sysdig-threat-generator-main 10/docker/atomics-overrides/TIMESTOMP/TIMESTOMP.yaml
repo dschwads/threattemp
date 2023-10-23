@@ -1,0 +1,21 @@
+attack_technique: Test
+display_name: Modify Timestamp attribute in File
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary File:
+      description: Name of the temporary file used
+      type: String
+      default: tmp_timestomp_file
+  executor:
+    command: |
+      touch "/tmp/#{Temporary File}"
+      touch -d "Jan 01 00:00" "/tmp/#{Temporary File}"
+    cleanup_command: |
+      rm "/tmp/#{Temporary File}"
+    name: bash
+    elevation_required: false

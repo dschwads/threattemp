@@ -1,0 +1,20 @@
+attack_technique: Test
+display_name: GPG Key Reconnaissance
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  executor:
+    command: |
+      DIRS=$(find /home /root -type d -name .gnupg 2>/dev/null)
+      for dir in $DIRS
+        do if ls $dir/private*/*.key 1>/dev/null 2>&1
+          then echo "Found keys in:" $dir/private*
+          echo -n "- "
+          ls $dir/private*
+        fi
+      done
+    name: bash
+    elevation_required: false

@@ -1,0 +1,23 @@
+attack_technique: Test
+display_name: PROOT.EXEC
+atomic_tests:
+- name: PROOT.EXEC
+  description: executes a command under Proot tmpfs
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_proot_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}" 2>/dev/null; cd "/tmp/#{Temporary Directory}"
+      curl -LO -s https://proot.gitlab.io/proot/bin/proot
+      chmod +x proot
+      ./proot id 1>/dev/null
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}" 2>/dev/null
+    name: bash
+    elevation_required: false

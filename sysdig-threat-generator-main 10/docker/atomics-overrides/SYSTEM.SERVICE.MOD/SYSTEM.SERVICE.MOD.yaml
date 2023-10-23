@@ -1,0 +1,26 @@
+attack_technique: Test
+display_name: System Service Modification
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    System Service File:
+      description: Name of the service file to modify
+      type: String
+      default: sshd.service
+    Command:
+      description: Command to execute at the start of the service
+      type: String
+      default: id
+  executor:
+    command: |
+      cp "/etc/systemd/system/#{System Service File}" "/tmp/tmp_servicemod_file"
+      BEFORE=$(grep ExecStart= "/etc/systemd/system/#{System Service File}")
+      sed -i "s,$BEFORE,ExecStart=#{Command},g" "/etc/systemd/system/#{System Service File}"
+    cleanup_command: |
+      mv "/tmp/tmp_servicemod_file" "/etc/systemd/system/#{System Service File}"
+    name: bash
+    elevation_required: true

@@ -1,0 +1,20 @@
+attack_technique: Test
+display_name: find SUID binaries
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary User:
+      description: Name for the new temporary user created
+      type: String
+      default: tmp_suid_user
+  executor:
+    command: |
+      useradd -M -N "#{Temporary User}"
+      sudo -u "#{Temporary User}" find / -type f -perm -u=s 2>/dev/null
+      userdel "#{Temporary User}"
+    name: bash
+    elevation_required: true

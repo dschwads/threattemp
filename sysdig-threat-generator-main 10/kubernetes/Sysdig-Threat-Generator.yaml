@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: threatgen
+  labels:
+    app: threatgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: threatgen
+  template:
+    metadata:
+      labels:
+        app: threatgen
+    spec:
+      containers:
+      - name: threatgen
+        image: dockerbadboy/art:latest
+        command: ["pwsh", "-c", "(./RunTests.ps1 XMRIG.EXEC)"]
+        securityContext:
+          privileged: true
+      nodeSelector:
+        kubernetes.io/os: linux

@@ -1,0 +1,28 @@
+attack_technique: Test
+display_name: Program run with disallowed http proxy env
+atomic_tests:
+- name: Test
+  description: Test
+  supported_platforms:
+    - linux
+    - containers
+  input_arguments:
+    Temporary Directory:
+      description: Name of the temporary directory used for this test
+      type: String
+      default: tmp_proxy_dir
+  executor:
+    command: |
+      mkdir "/tmp/#{Temporary Directory}"; cd "/tmp/#{Temporary Directory}"
+      curl -L -o tinyproxy.tar.gz https://github.com/tinyproxy/tinyproxy/releases/download/1.11.1/tinyproxy-1.11.1.tar.gz
+      tar -xzf tinyproxy.tar.gz
+      cd tinyproxy-1.11.1
+      ./configure && make
+      echo UG9ydCAzMTMzNwpMaXN0ZW4gMTI3LjAuMC4xClRpbWVvdXQgNjAwCkFsbG93IDEyNy4wLjAuMQo= | base64 -d > tmp.conf
+      src/tinyproxy -d -c ./tmp.conf & TINYPROXY_PID=$!
+      HTTP_PROXY=127.0.0.1:31337 curl google.com
+      kill -9 $TINYPROXY_PID && wait $TINYPROXY_PID
+    cleanup_command: |
+      rm -r "/tmp/#{Temporary Directory}"
+    name: bash
+    elevation_required: false
